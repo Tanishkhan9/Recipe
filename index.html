@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gourmet Recipe Book</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Reset & base */
+    :root {
+      --primary: #28a745;
+      --primary-dark: #218838;
+      --secondary: #6c757d;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --danger: #dc3545;
+      --warning: #ffc107;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Layout */
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .container { 
+      padding: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Navigation */
+    nav {
+      background: var(--dark);
+      padding: 0.5rem 1rem;
+    }
+    
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 1rem;
+    }
+    
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover {
+      color: var(--warning);
+    }
+
+    /* Search & filter */
+    .controls { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 1rem; 
+      margin-bottom: 1.5rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .search-group {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+    
+    .controls input, .controls select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .search-group i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--secondary);
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn:hover {
+      background: #f0f0f0;
+    }
+    
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Grid of cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card:hover { 
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15); 
+    }
+    
+    .card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .card-content {
+      padding: 1rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-category {
+      background: var(--light);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      align-self: flex-start;
+    }
+    
+    .veg { color: var(--primary); }
+    .non-veg { color: var(--danger); }
+    
+    .card-description {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.5rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .rating {
+      color: var(--warning);
+    }
+    
+    .time {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.9rem;
+    }
+
+    /* Detail view */
+    .detail {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      text-decoration: none;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    
+    .back-btn:hover { 
+      background: rgba(40, 167, 69, 0.1);
+      text-decoration: none;
+    }
+    
+    .detail-header {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .detail-img {
+      width: 100%;
+      max-width: 500px;
+      height: 350px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .detail-info {
+      flex: 1;
+    }
+    
+    .detail-title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .detail-meta {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--secondary);
+    }
+    
+    .detail-description {
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    
+    .detail-section {
+      margin-bottom: 2rem;
+    }
+    
+    .detail-section h2 {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .detail-section ul, .detail-section ol {
+      margin-left: 1.5rem;
+    }
+    
+    .detail-section li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .ingredient-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .ingredient-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    
+    .ingredient-item:hover {
+      background: var(--light);
+    }
+    
+    .ingredient-checkbox {
+      cursor: pointer;
+    }
+    
+    .nutrition-facts {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    
+    .nutrition-item {
+      text-align: center;
+    }
+    
+    .nutrition-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .nutrition-label {
+      font-size: 0.9rem;
+      color: var(--secondary);
+    }
+    
+    /* Add recipe form */
+    .form-container {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .detail-header {
+        flex-direction: column;
+      }
+      
+      .detail-img {
+        width: 100%;
+        height: auto;
+      }
+      
+      .controls {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <h1>Gourmet Recipe Book</h1>
+      <div>
+        <button class="btn btn-primary" id="addRecipeBtn">
+          <i class="fas fa-plus"></i> Add Recipe
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <nav>
+    <ul class="nav-links">
+      <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="#"><i class="fas fa-utensils"></i> Categories</a></li>
+      <li><a href="#"><i class="fas fa-heart"></i> Favorites</a></li>
+      <li><a href="#"><i class="fas fa-user"></i> My Recipes</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+
+    <!-- Controls -->
+    <div class="controls" id="controls">
+      <div class="search-group">
+        <input type="text" id="searchInput" placeholder="Search recipes...">
+        <i class="fas fa-search"></i>
+      </div>
+      
+      <select id="categorySelect" class="form-control">
+        <option value="">All Categories</option>
+        <option value="vegetarian">Vegetarian</option>
+        <option value="non-vegetarian">Non-Vegetarian</option>
+        <option value="vegan">Vegan</option>
+        <option value="gluten-free">Gluten Free</option>
+        <option value="keto">Keto</option>
+      </select>
+      
+      <select id="difficultySelect" class="form-control">
+        <option value="">Any Difficulty</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="popular">Popular</button>
+        <button class="filter-btn" data-filter="quick">Quick Meals</button>
+        <button class="filter-btn" data-filter="healthy">Healthy</button>
+      </div>
+    </div>
+
+    <!-- List View -->
+    <div class="grid" id="listView"></div>
+
+    <!-- Detail View (hidden by default) -->
+    <div id="detailView" class="detail" style="display:none;"></div>
+    
+    <!-- Add Recipe Form (hidden by default) -->
+    <div id="addRecipeView" class="form-container" style="display:none;">
+      <h2>Add New Recipe</h2>
+      <form id="recipeForm">
+        <div class="form-group">
+          <label for="recipeName" class="form-label">Recipe Name</label>
+          <input type="text" id="recipeName" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="recipeCategory" class="form-label">Category</label>
+          <select id="recipeCategory" class="form-control" required>
+            <option value="">Select Category</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="non-vegetarian">Non-Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="gluten-free">Gluten Free</option>
+            <option value="keto">Keto</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="recipeDifficulty" class="form-label">Difficulty</label>
+          <select id="recipeDifficulty" class="form-control" required>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="recipeTime" class="form-label">Prep Time (minutes)</label>
+          <input type="number" id="recipeTime" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="recipeImage" class="form-label">Image URL</label>
+          <input type="text" id="recipeImage" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="recipeDescription" class="form-label">Description</label>
+          <textarea id="recipeDescription" class="form-control" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Ingredients</label>
+          <div id="ingredientsContainer">
+            <div class="ingredient-input">
+              <input type="text" class="form-control" placeholder="Ingredient" style="margin-bottom: 0.5rem;">
+              <button type="button" class="btn btn-secondary btn-sm remove-ingredient">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" id="addIngredient">
+            <i class="fas fa-plus"></i> Add Ingredient
+          </button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Steps</label>
+          <div id="stepsContainer">
+            <div class="step-input">
+              <textarea class="form-control" placeholder="Step description" style="margin-bottom: 0.5rem;"></textarea>
+              <button type="button" class="btn btn-secondary btn-sm remove-step">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" id="addStep">
+            <i class="fas fa-plus"></i> Add Step
+          </button>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelRecipe">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Recipe</button>
+        </div>
+      </form>
+    </div>
+
+  </main>
+
+  <script>
+    // ===== Recipe Data =====
+    const recipes = [
+      {
+        id: '1',
+        name: 'Classic Margherita Pizza',
+        category: 'vegetarian',
+        difficulty: 'easy',
+        prepTime: 30,
+        cookTime: 12,
+        servings: 4,
+        rating: 4.8,
+        reviews: 124,
+        favorite: true,
+        image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+        description: 'A simple yet delicious traditional Italian pizza with fresh basil, mozzarella, and tomato sauce on a thin crust.',
+        ingredients: [
+          { name: 'Pizza dough', amount: '1 lb' },
+          { name: 'San Marzano tomato sauce', amount: '1/2 cup' },
+          { name: 'Fresh mozzarella', amount: '8 oz, sliced' },
+          { name: 'Fresh basil leaves', amount: '1/4 cup' },
+          { name: 'Extra virgin olive oil', amount: '2 tbsp' },
+          { name: 'Salt', amount: 'to taste' }
+        ],
+        steps: [
+          'Preheat oven to 475°F (245°C) with pizza stone if available.',
+          'Roll out dough on floured surface to 12-inch circle.',
+          'Spread tomato sauce evenly over dough, leaving small border.',
+          'Arrange mozzarella slices over sauce.',
+          'Bake for 10-12 minutes until crust is golden and cheese bubbles.',
+          'Remove from oven, drizzle with olive oil and sprinkle with fresh basil.',
+          'Slice and serve immediately.'
+        ],
+        nutrition: {
+          calories: 285,
+          carbs: 36,
+          protein: 12,
+          fat: 10,
+          fiber: 2
+        },
+        tags: ['italian', 'quick', 'popular']
+      },
+      {
+        id: '2',
+        name: 'Spicy Chicken Curry',
+        category: 'non-vegetarian',
+        difficulty: 'medium',
+        prepTime: 20,
+        cookTime: 40,
+        servings: 6,
+        rating: 4.5,
+        reviews: 89,
+        favorite: false,
+        image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+        description: 'Aromatic and flavorful Indian-style chicken curry with a perfect blend of spices and creamy texture.',
+        ingredients: [
+          { name: 'Chicken thighs', amount: '2 lbs, boneless' },
+          { name: 'Onion', amount: '1 large, diced' },
+          { name: 'Garlic', amount: '4 cloves, minced' },
+          { name: 'Ginger', amount: '1 tbsp, grated' },
+          { name: 'Tomato puree', amount: '1 cup' },
+          { name: 'Coconut milk', amount: '1 can (13.5 oz)' },
+          { name: 'Curry powder', amount: '2 tbsp' },
+          { name: 'Turmeric', amount: '1 tsp' },
+          { name: 'Cumin', amount: '1 tsp' },
+          { name: 'Coriander', amount: '1 tsp' },
+          { name: 'Red chili flakes', amount: '1/2 tsp' },
+          { name: 'Vegetable oil', amount: '2 tbsp' },
+          { name: 'Salt', amount: 'to taste' }
+        ],
+        steps: [
+          'Heat oil in large pot over medium heat. Add onions and sauté until golden.',
+          'Add garlic, ginger and sauté for 1 minute until fragrant.',
+          'Add chicken and brown on all sides, about 5 minutes.',
+          'Stir in all spices and cook for 1 minute to release aromas.',
+          'Add tomato puree and simmer for 5 minutes.',
+          'Pour in coconut milk, bring to simmer, then reduce heat.',
+          'Cover and cook for 30 minutes, stirring occasionally.',
+          'Uncover and cook 10 more minutes to thicken sauce if needed.',
+          'Adjust seasoning and serve with rice or naan bread.'
+        ],
+        nutrition: {
+          calories: 420,
+          carbs: 12,
+          protein: 35,
+          fat: 26,
+          fiber: 3
+        },
+        tags: ['indian', 'spicy', 'dinner']
+      },
+      {
+        id: '3',
+        name: 'Avocado Toast with Poached Egg',
+        category: 'vegetarian',
+        difficulty: 'easy',
+        prepTime: 5,
+        cookTime: 10,
+        servings: 2,
+        rating: 4.7,
+        reviews: 56,
+        favorite: true,
+        image: 'https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+        description: 'A healthy and satisfying breakfast with creamy avocado and perfectly poached eggs on toasted sourdough.',
+        ingredients: [
+          { name: 'Sourdough bread', amount: '2 slices' },
+          { name: 'Ripe avocado', amount: '1' },
+          { name: 'Eggs', amount: '2' },
+          { name: 'Lemon juice', amount: '1 tsp' },
+          { name: 'Red pepper flakes', amount: 'pinch' },
+          { name: 'Salt and pepper', amount: 'to taste' },
+          { name: 'Extra virgin olive oil', amount: '1 tbsp' }
+        ],
+        steps: [
+          'Toast bread until golden and crisp.',
+          'Cut avocado in half, remove pit, and scoop flesh into bowl.',
+          'Mash avocado with lemon juice, salt, and pepper.',
+          'Bring pot of water to gentle simmer, add splash of vinegar.',
+          'Crack eggs into small cups, then gently slide into water.',
+          'Poach eggs for 3-4 minutes until whites are set but yolks still runny.',
+          'Spread mashed avocado on toast, top with poached egg.',
+          'Drizzle with olive oil, sprinkle with red pepper flakes and salt.'
+        ],
+        nutrition: {
+          calories: 320,
+          carbs: 22,
+          protein: 12,
+          fat: 22,
+          fiber: 8
+        },
+        tags: ['breakfast', 'healthy', 'quick']
+      },
+      {
+        id: '4',
+        name: 'Beef Bourguignon',
+        category: 'non-vegetarian',
+        difficulty: 'hard',
+        prepTime: 30,
+        cookTime: 180,
+        servings: 6,
+        rating: 4.9,
+        reviews: 42,
+        favorite: false,
+        image: 'https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+        description: 'Classic French beef stew slow-cooked in red wine with mushrooms, carrots, and pearl onions.',
+        ingredients: [
+          { name: 'Beef chuck', amount: '3 lbs, cubed' },
+          { name: 'Bacon', amount: '6 oz, diced' },
+          { name: 'Carrots', amount: '3, sliced' },
+          { name: 'Onion', amount: '1 large, diced' },
+          { name: 'Garlic', amount: '4 cloves, minced' },
+          { name: 'Button mushrooms', amount: '1 lb, quartered' },
+          { name: 'Pearl onions', amount: '1 cup, peeled' },
+          { name: 'Red wine', amount: '2 cups (Burgundy)' },
+          { name: 'Beef stock', amount: '2 cups' },
+          { name: 'Tomato paste', amount: '2 tbsp' },
+          { name: 'Flour', amount: '3 tbsp' },
+          { name: 'Thyme', amount: '1 tbsp' },
+          { name: 'Bay leaves', amount: '2' },
+          { name: 'Salt and pepper', amount: 'to taste' }
+        ],
+        steps: [
+          'Preheat oven to 325°F (165°C).',
+          'Cook bacon in large Dutch oven until crisp. Remove and set aside.',
+          'Pat beef dry and brown in batches in bacon fat. Remove and set aside.',
+          'Sauté carrots, onion, and garlic until softened, about 5 minutes.',
+          'Stir in tomato paste and flour, cook 1 minute.',
+          'Add wine, scraping up browned bits from bottom of pot.',
+          'Return beef and bacon to pot. Add stock, thyme, and bay leaves.',
+          'Bring to simmer, cover, and transfer to oven.',
+          'Cook for 2 hours, then add mushrooms and pearl onions.',
+          'Continue cooking 1 more hour until beef is very tender.',
+          'Adjust seasoning and serve with mashed potatoes or crusty bread.'
+        ],
+        nutrition: {
+          calories: 580,
+          carbs: 18,
+          protein: 42,
+          fat: 32,
+          fiber: 4
+        },
+        tags: ['french', 'dinner', 'comfort-food']
+      },
+      {
+        id: '5',
+        name: 'Quinoa Salad with Roasted Vegetables',
+        category: 'vegan',
+        difficulty: 'easy',
+        prepTime: 15,
+        cookTime: 25,
+        servings: 4,
+        rating: 4.6,
+        reviews: 37,
+        favorite: true,
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+        description: 'Nutritious and colorful salad with protein-packed quinoa and seasonal roasted vegetables.',
+        ingredients: [
+          { name: 'Quinoa', amount: '1 cup, uncooked' },
+          { name: 'Bell peppers', amount: '2, diced' },
+          { name: 'Zucchini', amount: '1, diced' },
+          { name: 'Eggplant', amount: '1 small, diced' },
+          { name: 'Cherry tomatoes', amount: '1 cup, halved' },
+          { name: 'Red onion', amount: '1/2, thinly sliced' },
+          { name: 'Olive oil', amount: '3 tbsp' },
+          { name: 'Lemon juice', amount: '2 tbsp' },
+          { name: 'Fresh parsley', amount: '1/4 cup, chopped' },
+          { name: 'Salt and pepper', amount: 'to taste' },
+          { name: 'Feta cheese (optional)', amount: '1/2 cup, crumbled' }
+        ],
+        steps: [
+          'Preheat oven to 400°F (200°C).',
+          'Rinse quinoa thoroughly, then cook according to package instructions.',
+          'Toss bell peppers, zucchini, and eggplant with 2 tbsp olive oil, salt, and pepper.',
+          'Spread vegetables on baking sheet and roast for 20-25 minutes until tender.',
+          'In large bowl, combine cooked quinoa, roasted vegetables, cherry tomatoes, and red onion.',
+          'Whisk together remaining olive oil, lemon juice, salt, and pepper for dressing.',
+          'Pour dressing over salad and toss to combine.',
+          'Stir in fresh parsley and feta cheese if using.',
+          'Serve warm or chilled.'
+        ],
+        nutrition: {
+          calories: 280,
+          carbs: 35,
+          protein: 8,
+          fat: 12,
+          fiber: 6
+        },
+        tags: ['healthy', 'lunch', 'meal-prep']
+      }
+    ];
+
+    // ===== DOM References =====
+    const listView = document.getElementById('listView');
+    const detailView = document.getElementById('detailView');
+    const addRecipeView = document.getElementById('addRecipeView');
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const addRecipeBtn = document.getElementById('addRecipeBtn');
+    const cancelRecipeBtn = document.getElementById('cancelRecipe');
+    const recipeForm = document.getElementById('recipeForm');
+    const ingredientsContainer = document.getElementById('ingredientsContainer');
+    const addIngredientBtn = document.getElementById('addIngredient');
+    const stepsContainer = document.getElementById('stepsContainer');
+    const addStepBtn = document.getElementById('addStep');
+
+    // ===== Helper Functions =====
+    function renderRating(rating) {
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 >= 0.5;
+      let stars = '';
+      
+      for (let i = 0; i < fullStars; i++) {
+        stars += '<i class="fas fa-star"></i>';
+      }
+      
+      if (hasHalfStar) {
+        stars += '<i class="fas fa-star-half-alt"></i>';
+      }
+      
+      const emptyStars = 5 - Math.ceil(rating);
+      for (let i = 0; i < emptyStars; i++) {
+        stars += '<i class="far fa-star"></i>';
+      }
+      
+      return `<span class="rating">${stars}</span>`;
+    }
+
+    function formatTime(minutes) {
+      if (minutes < 60) return `${minutes} min`;
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hours}h ${mins > 0 ? `${mins}m` : ''}`;
+    }
+
+    // ===== Render Functions =====
+    function renderList() {
+      detailView.style.display = 'none';
+      addRecipeView.style.display = 'none';
+      listView.style.display = 'grid';
+      listView.innerHTML = '';
+
+      const searchTerm = searchInput.value.toLowerCase();
+      const category = categorySelect.value;
+      const difficulty = difficultySelect.value;
+      const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter;
+
+      const filtered = recipes.filter(r => {
+        // Search term matching
+        const matchesSearch = r.name.toLowerCase().includes(searchTerm) || 
+                            r.description.toLowerCase().includes(searchTerm) ||
+                            r.tags.some(tag => tag.includes(searchTerm));
+        
+        // Category matching
+        const matchesCategory = category === '' || r.category === category;
+        
+        // Difficulty matching
+        const matchesDifficulty = difficulty === '' || r.difficulty === difficulty;
+        
+        // Special filters
+        let matchesFilter = true;
+        if (activeFilter === 'popular') {
+          matchesFilter = r.rating >= 4.5;
+        } else if (activeFilter === 'quick') {
+          matchesFilter = (r.prepTime + r.cookTime) <= 30;
+        } else if (activeFilter === 'healthy') {
+          matchesFilter = r.nutrition.calories <= 400 && 
+                         r.nutrition.fat <= 15 && 
+                         r.nutrition.fiber >= 5;
+        }
+        
+        return matchesSearch && matchesCategory && matchesDifficulty && matchesFilter;
+      });
+
+      if (filtered.length === 0) {
+        listView.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:2rem;">
+            <i class="fas fa-search" style="font-size:3rem; color:#ccc; margin-bottom:1rem;"></i>
+            <h3>No recipes found</h3>
+            <p>Try adjusting your search or filters</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.onclick = () => showDetail(r.id);
+
+        card.innerHTML = `
+          <img src="${r.image}" alt="${r.name}" class="card-img">
+          <div class="card-content">
+            <div class="card-title">${r.name}</div>
+            <div class="card-meta">
+              <span>${formatTime(r.prepTime + r.cookTime)}</span>
+              <span>${r.servings} ${r.servings === 1 ? 'serving' : 'servings'}</span>
+            </div>
+            <div class="card-category ${r.category.includes('veg') ? 'veg' : 'non-veg'}">
+              ${r.category.replace('-', ' ')}
+            </div>
+            <div class="card-description">${r.description}</div>
+            <div class="card-footer">
+              ${renderRating(r.rating)}
+              <span class="time"><i class="far fa-clock"></i> ${r.difficulty}</span>
+            </div>
+          </div>
+        `;
+        listView.appendChild(card);
+      });
+    }
+
+    function showDetail(id) {
+      const recipe = recipes.find(r => r.id === id);
+      if (!recipe) return;
+
+      listView.style.display = 'none';
+      detailView.style.display = 'block';
+
+      // Generate ingredients list
+      const ingredientsList = recipe.ingredients.map(i => `
+        <div class="ingredient-item">
+          <input type="checkbox" class="ingredient-checkbox">
+          <span>${i.amount} ${i.name}</span>
+        </div>
+      `).join('');
+
+      // Generate nutrition facts
+      const nutritionFacts = `
+        <div class="nutrition-item">
+          <div class="nutrition-value">${recipe.nutrition.calories}</div>
+          <div class="nutrition-label">Calories</div>
+        </div>
+        <div class="nutrition-item">
+          <div class="nutrition-value">${recipe.nutrition.carbs}g</div>
+          <div class="nutrition-label">Carbs</div>
+        </div>
+        <div class="nutrition-item">
+          <div class="nutrition-value">${recipe.nutrition.protein}g</div>
+          <div class="nutrition-label">Protein</div>
+        </div>
+        <div class="nutrition-item">
+          <div class="nutrition-value">${recipe.nutrition.fat}g</div>
+          <div class="nutrition-label">Fat</div>
+        </div>
+        <div class="nutrition-item">
+          <div class="nutrition-value">${recipe.nutrition.fiber}g</div>
+          <div class="nutrition-label">Fiber</div>
+        </div>
+      `;
+
+      detailView.innerHTML = `
+        <div class="back-btn" onclick="renderList()">
+          <i class="fas fa-arrow-left"></i> Back to recipes
+        </div>
+        
+        <div class="detail-header">
+          <img src="${recipe.image}" alt="${recipe.name}" class="detail-img">
+          <div class="detail-info">
+            <h1 class="detail-title">${recipe.name}</h1>
+            <div class="detail-meta">
+              <span><i class="fas fa-utensils"></i> ${recipe.category.replace('-', ' ')}</span>
+              <span><i class="far fa-clock"></i> ${formatTime(recipe.prepTime + recipe.cookTime)}</span>
+              <span><i class="fas fa-chart-line"></i> ${recipe.difficulty}</span>
+              <span><i class="fas fa-users"></i> Serves ${recipe.servings}</span>
+              ${recipe.favorite ? '<span><i class="fas fa-heart" style="color:var(--danger)"></i> Favorite</span>' : ''}
+            </div>
+            <div class="detail-description">${recipe.description}</div>
+            ${renderRating(recipe.rating)}
+            <span style="color:var(--secondary); font-size:0.9rem;"> (${recipe.reviews} reviews)</span>
+            
+            <div class="detail-section nutrition-facts">
+              <h2>Nutrition Facts</h2>
+              <div class="nutrition-grid">
+                ${nutritionFacts}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h2>Ingredients</h2>
+          <div class="ingredient-list">
+            ${ingredientsList}
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h2>Instructions</h2>
+          <ol>
+            ${recipe.steps.map(s => `<li>${s}</li>`).join('')}
+          </ol>
+        </div>
+        
+        <div class="detail-section">
+          <h2>Tags</h2>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${recipe.tags.map(t => `<span class="card-category">${t}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function showAddRecipeForm() {
+      listView.style.display = 'none';
+      detailView.style.display = 'none';
+      addRecipeView.style.display = 'block';
+    }
+
+    // ===== Form Handling =====
+    function addIngredientField() {
+      const div = document.createElement('div');
+      div.className = 'ingredient-input';
+      div.innerHTML = `
+        <input type="text" class="form-control" placeholder="Ingredient" style="margin-bottom: 0.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm remove-ingredient">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      ingredientsContainer.appendChild(div);
+      div.querySelector('.remove-ingredient').addEventListener('click', () => div.remove());
+    }
+
+    function addStepField() {
+      const div = document.createElement('div');
+      div.className = 'step-input';
+      div.innerHTML = `
+        <textarea class="form-control" placeholder="Step description" style="margin-bottom: 0.5rem;"></textarea>
+        <button type="button" class="btn btn-secondary btn-sm remove-step">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      stepsContainer.appendChild(div);
+      div.querySelector('.remove-step').addEventListener('click', () => div.remove());
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      // Gather form data
+      const name = document.getElementById('recipeName').value;
+      const category = document.getElementById('recipeCategory').value;
+      const difficulty = document.getElementById('recipeDifficulty').value;
+      const prepTime = parseInt(document.getElementById('recipeTime').value);
+      const image = document.getElementById('recipeImage').value;
+      const description = document.getElementById('recipeDescription').value;
+      
+      const ingredients = Array.from(ingredientsContainer.querySelectorAll('input'))
+        .map(input => ({ name: input.value, amount: '' }));
+        
+      const steps = Array.from(stepsContainer.querySelectorAll('textarea'))
+        .map(textarea => textarea.value);
+      
+      // Create new recipe (in a real app, this would save to a database)
+      const newRecipe = {
+        id: Date.now().toString(),
+        name,
+        category,
+        difficulty,
+        prepTime,
+        cookTime: 0, // Default value
+        servings: 4, // Default value
+        rating: 0, // Default value
+        reviews: 0, // Default value
+        favorite: false,
+        image,
+        description,
+        ingredients,
+        steps,
+        nutrition: {
+          calories: 0,
+          carbs: 0,
+          protein: 0,
+          fat: 0,
+          fiber: 0
+        },
+        tags: []
+      };
+      
+      // Add to recipes array (in a real app, this would be an API call)
+      recipes.unshift(newRecipe);
+      
+      // Reset form
+      recipeForm.reset();
+      ingredientsContainer.innerHTML = '';
+      stepsContainer.innerHTML = '';
+      addIngredientField();
+      addStepField();
+      
+      // Show the new recipe
+      renderList();
+      showDetail(newRecipe.id);
+      
+      // Show success message (in a real app, this would be more robust)
+      alert('Recipe added successfully!');
+    }
+
+    // ===== Event Listeners =====
+    searchInput.addEventListener('input', renderList);
+    categorySelect.addEventListener('change', renderList);
+    difficultySelect.addEventListener('change', renderList);
+    
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderList();
+      });
+    });
+    
+    addRecipeBtn.addEventListener('click', showAddRecipeForm);
+    cancelRecipeBtn.addEventListener('click', renderList);
+    recipeForm.addEventListener('submit', handleFormSubmit);
+    addIngredientBtn.addEventListener('click', addIngredientField);
+    addStepBtn.addEventListener('click', addStepField);
+
+    // ===== Initialization =====
+    addIngredientField();
+    addStepField();
+    renderList();
+  </script>
+</body>
+</html>
